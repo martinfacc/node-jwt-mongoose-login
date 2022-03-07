@@ -22,5 +22,5 @@ app.use(notFound)
 app.use(errorHandler)
 
 app.listen(APP_PORT, () => {
-	console.log(`RRHH app listening on port ${PORT}!`)
+	console.log(`App listening on port ${APP_PORT}!`)
 })
