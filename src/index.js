@@ -16,10 +16,6 @@ app.use(express.json())
 app.use(cors())
 app.use(logger)
 
-app.get('/', (request, response) => {
-	response.status(200).send('Hello World!')
-})
-
 app.use('/api/user', userRouter)
 app.use(notFound)
 app.use(errorHandler)
