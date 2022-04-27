@@ -1,46 +1,29 @@
-import User from '../models/User.js'
+import Session from '../models/session.js'
 import jwt from 'jsonwebtoken'
 
 const { JWT_SECRET } = process.env
 
-const validateExpirationDate = (session) => {
-  try {
-    const dateNow = new Date()
-  const expirationDate = session.expirationDate
-  if (dateNow.getTime() < expirationDate.getTime()) return true
-  }
-  catch (error) {
-    console.log(error)
-  }
-}
-
-const authenticateSession = async (id, userId) => {
-  try {
-    const user = await User.findOne({ _id: userId }).populate('sessions')
-
-    const session = user.sessions.find(session => session._id === id)
-    if (!session) throw new Error('Authentication failed')
-
-    const sessionIsExpired = !validateExpirationDate(session)
-    if (sessionIsExpired) throw new Error('Authentication failed')
-    
-    return true
-  } catch {}
+const authenticateSession = async (sessionId, userId) => {
+	try {
+		const session = await Session.find({ _id: sessionId, userId })
+		if (!session) throw new Error()
+	} catch {
+		throw new Error('invalidSession')
+	}
 }
 
 const sessionExtractor = async (request, response, next) => {
-  try {
-    const header = request.get('authorization')
-    if (!header || !header.startsWith('Bearer')) throw new Error('Unauthorized')
-    const token = header.slice(7, header.length)
-    const { id, user: userId } = jwt.verify(token, JWT_SECRET)
-    if (!token || !id || !userId) throw new Error('Unauthorized')
-    const isValid = await authenticateSession(id, userId)
-    if (!isValid) throw new Error('Unauthorized')
-    next()
-  } catch (error) {
-    next(error)
-  }
+	try {
+		const header = request.get('authorization')
+		if (!header || !header.startsWith('Bearer')) throw new Error('noAuthenticationHeader')
+		const token = header.slice(7, header.length)
+		const { sessionId, userId } = jwt.verify(token, JWT_SECRET)
+		if (!token || !sessionId || !userId) throw new Error('invalidAuthenticationToken')
+		await authenticateSession(sessionId, userId)
+		next()
+	} catch (error) {
+		next(error)
+	}
 }
 
 export default sessionExtractor

@@ -9,13 +9,12 @@
         "sourceType": "module"
     },
     "rules": {
+        "camelcase": 1,
+        "no-confusing-arrow": 1,
+        "no-shadow": 1,
         "indent": [
             "error",
             "tab"
-        ],
-        "linebreak-style": [
-            "error",
-            "unix"
         ],
         "quotes": [
             "error",
@@ -25,5 +24,8 @@
             "error",
             "never"
         ]
+    },
+    "globals": {
+        "process": true
     }
 }
